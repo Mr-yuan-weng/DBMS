@@ -751,8 +751,106 @@ RC Update(char *relName,char *attrName,Value *value,int nConditions,Condition *c
 	return SUCCESS;
 }
 
-RC Insert(char *relName,int nValues,Value * values)
+
+RC Insert(char *relName,int nValues,Value *values)
 {
+	RC tmp;
+	RM_FileHandle *filehandle=(RM_FileHandle*)malloc(sizeof(RM_FileHandle));
+	tmp=RM_OpenFile(relName,filehandle);
+	if (tmp!=SUCCESS)
+	{
+		AfxMessageBox("打开该表文件失败");
+		return tmp;
+	}
+	char *pdata;
+	int offset=0;
+	RID *rid=(RID*)malloc(sizeof(RID));
+	for (int i=0;i<nValues;i++)
+	{
+		switch(values[i].type){
+		case ints:
+			memcpy(pdata+offset,values[i].data,sizeof(int));
+			offset=offset+sizeof(int);
+			break;
+		case floats:
+			memcpy(pdata+offset,values[i].data,sizeof(float));
+			offset=offset+sizeof(float);
+			break;
+		case chars:
+			memcpy(pdata+offset,values[i].data,21);
+			offset=offset+21;
+			break;
+		}
+	}
+	tmp=InsertRec(filehandle,pdata,rid);
+	if (tmp!=SUCCESS)
+	{
+		AfxMessageBox("插入记录失败");
+		return tmp;
+	}
+	free(filehandle);
+	free(rid);
+	RM_FileHandle *column_filehandle=(RM_FileHandle*)malloc(sizeof(RM_FileHandle));
+	RM_FileScan *column_filescan=(RM_FileScan*)malloc(sizeof(RM_FileScan));
+	RM_Record *column_record=(RM_Record*)malloc(sizeof(RM_Record));
+	IX_IndexHandle *indexhandle=(IX_IndexHandle*)malloc(sizeof(IX_IndexHandle));
+	//IX_IndexScan *indexscan=(IX_IndexScan*)malloc(sizeof(IX_IndexScan));
+	tmp=RM_OpenFile("SYSCOLUMNS.XX",column_filehandle);
+	if (tmp!=SUCCESS)
+	{
+		AfxMessageBox("打开列文件失败");
+		return tmp;
+	}
+	Con *con=(Con*)malloc(sizeof(Con));
+	con->bLhsIsAttr=1;
+	con->bRhsIsAttr=0;
+	con->attrType=chars;
+	con->LattrLength=21;
+	con->LattrOffset=0;
+	con->compOp=EQual;
+	strcmp((char*)con->Rvalue,relName);
+	tmp=OpenScan(column_filescan,column_filehandle,1,con);
+	if (tmp!=SUCCESS)
+	{
+		AfxMessageBox("打开列文件扫描失败");
+		return tmp;
+	}
+	for (int i=0;i<nValues;i++)
+	{
+		tmp=GetNextRec(column_filescan,column_record);
+		if (tmp!=SUCCESS)
+		{
+			AfxMessageBox("获取记录失败");
+			return tmp;
+		}
+		char ix_flag='0';
+		char* indexname=(char*)malloc(sizeof(char));
+		//char* indexdata=(char*)malloc(sizeof(char));
+		memcpy(&ix_flag,column_record->pData+54,sizeof(char));
+		if (ix_flag=='1')
+		{
+			//values[i].data;
+			memcpy(indexname,column_record->pData+55,21);
+			tmp=OpenIndex(indexname,indexhandle);
+			if (tmp!=SUCCESS)
+			{
+				AfxMessageBox("打开索引失败");
+				return tmp;
+			}
+			tmp=InsertEntry(indexhandle,values[i].data,rid);
+			if (tmp!=SUCCESS)
+			{
+				AfxMessageBox("插入索引成功");
+				return tmp;
+			}
+		}
+		free(indexname);
+	}
+	free(column_filehandle);
+	free(column_filescan);
+	free(column_record);
+	free(indexhandle);
+	//free(indexscan);
 	return SUCCESS;
 }
 RC Delete(char *relName,int nConditions,Condition *conditions)

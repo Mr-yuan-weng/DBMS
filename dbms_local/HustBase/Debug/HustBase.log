@@ -1,27 +1,59 @@
-﻿Build started 2018/12/23 18:22:03.
-     1>Project "F:\DBMS\HustBase（2018版）\HustBase（2018版）\HustBase.vcxproj" on node 2 (build target(s)).
+﻿Build started 2018/12/24 8:23:39.
+     1>Project "F:\dbms_local\HustBase\HustBase.vcxproj" on node 2 (build target(s)).
      1>InitializeBuildStatus:
          Creating "Debug\HustBase.unsuccessfulbuild" because "AlwaysCreate" was specified.
        ClCompile:
          All outputs are up-to-date.
-         All outputs are up-to-date.
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _WINDOWS /D _VC80_UPGRADE=0x0600 /D _MBCS /D _AFXDLL /Gm /EHsc /RTC1 /MDd /GS /Gy- /fp:precise /Zc:wchar_t /Zc:forScope /Yu"stdafx.h" /Fp".\Debug\HustBase.pch" /Fo".\Debug\\" /Fd".\Debug\vc100.pdb" /FR"Debug\\" /Gd /TP /analyze- /errorReport:prompt SYS_Manager.cpp
+         SYS_Manager.cpp
+     1>f:\dbms_local\hustbase\sys_manager.cpp(165): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 c:\program files (x86)\microsoft visual studio 10.0\vc\include\string.h(105) : see declaration of 'strcpy'
+     1>f:\dbms_local\hustbase\sys_manager.cpp(166): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 c:\program files (x86)\microsoft visual studio 10.0\vc\include\string.h(105) : see declaration of 'strcpy'
+     1>f:\dbms_local\hustbase\sys_manager.cpp(211): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 c:\program files (x86)\microsoft visual studio 10.0\vc\include\string.h(105) : see declaration of 'strcpy'
+     1>f:\dbms_local\hustbase\sys_manager.cpp(454): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 c:\program files (x86)\microsoft visual studio 10.0\vc\include\string.h(105) : see declaration of 'strcpy'
+     1>f:\dbms_local\hustbase\sys_manager.cpp(639): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 c:\program files (x86)\microsoft visual studio 10.0\vc\include\string.h(105) : see declaration of 'strcpy'
+     1>f:\dbms_local\hustbase\sys_manager.cpp(772): warning C4700: uninitialized local variable 'pdata' used
          All outputs are up-to-date.
        ResourceCompile:
          All outputs are up-to-date.
        ManifestResourceCompile:
          All outputs are up-to-date.
        Link:
-         All outputs are up-to-date.
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:".\Debug\HustBase.exe" /INCREMENTAL /NOLOGO /MANIFEST /ManifestFile:"Debug\HustBase.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"F:\dbms_local\HustBase\Debug\HustBase.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"Debug\HustBase.lib" /MACHINE:X86 Debug\HustBase.res
+         Debug\HustBase.exe.embed.manifest.res
+         .\Debug\EditArea.obj
+         .\Debug\HustBase.obj
+         .\Debug\HustBaseDoc.obj
+         .\Debug\HustBaseView.obj
+         .\Debug\IX_Manager.obj
+         .\Debug\lex.yy.obj
+         .\Debug\MainFrm.obj
+         .\Debug\parse.obj
+         .\Debug\PF_Manager.obj
+         .\Debug\QU_Manager.obj
+         .\Debug\RM_Manager.obj
+         .\Debug\StdAfx.obj
+         .\Debug\SYS_Manager.obj
+         .\Debug\TableList.obj
+         .\Debug\TreeList.obj
+         .\Debug\yacc_sql.tab.obj
        Manifest:
+         C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\bin\mt.exe /nologo /verbose /out:"Debug\HustBase.exe.embed.manifest" /manifest Debug\HustBase.exe.intermediate.manifest "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\Include\Manifest\dpiaware.manifest"
          All outputs are up-to-date.
+       LinkEmbedManifest:
          All outputs are up-to-date.
+         HustBase.vcxproj -> F:\dbms_local\HustBase\Debug\HustBase.exe
        BscMake:
-         All outputs are up-to-date.
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\bscmake.exe /nologo /o".\Debug\HustBase.bsc" Debug\EditArea.sbr Debug\HustBase.sbr Debug\HustBaseDoc.sbr Debug\HustBaseView.sbr Debug\IX_Manager.sbr Debug\lex.yy.sbr Debug\MainFrm.sbr Debug\parse.sbr Debug\PF_Manager.sbr Debug\QU_Manager.sbr Debug\RM_Manager.sbr Debug\StdAfx.sbr Debug\SYS_Manager.sbr Debug\TableList.sbr Debug\TreeList.sbr Debug\yacc_sql.tab.sbr
        FinalizeBuildStatus:
          Deleting file "Debug\HustBase.unsuccessfulbuild".
          Touching "Debug\HustBase.lastbuildstate".
-     1>Done Building Project "F:\DBMS\HustBase（2018版）\HustBase（2018版）\HustBase.vcxproj" (build target(s)).
+     1>Done Building Project "F:\dbms_local\HustBase\HustBase.vcxproj" (build target(s)).
 
 Build succeeded.
 
-Time Elapsed 00:00:00.23
+Time Elapsed 00:00:07.73

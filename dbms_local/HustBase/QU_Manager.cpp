@@ -31,7 +31,7 @@ RC Query(char * sql,SelResult * res)
 		tmpSel.nConditions,tmpSel.conditions,res);
 	return tmp;
 }
-RC getAttrMap(int nSelAttrs,RelAttr **selAttrs,map<string,vector<AttrNode>> &attrMap,int* sumLength)
+RC getAttrMap(int nSelAttrs,RelAttr **selAttrs,map<string,vector<AttrNode>> &attrMap)
 {
 	RM_FileHandle* tabHandle=(RM_FileHandle*)malloc(sizeof(RM_FileHandle));
 	RM_FileScan* tabScan=(RM_FileScan*)malloc(sizeof(RM_FileScan));
@@ -69,7 +69,9 @@ RC getAttrMap(int nSelAttrs,RelAttr **selAttrs,map<string,vector<AttrNode>> &att
 		memcpy(&attrNode.type,tmpRec->pData+42,sizeof(int));
 		memcpy(&attrNode.offset,tmpRec->pData+50,sizeof(int));
 		memcpy(&attrNode.length,tmpRec->pData+46,sizeof(int));
-		*sumLength+=attrNode.length;
+		if(*(tmpRec->pData+54)=='1')
+			attrNode.ifHasIndex=true;
+		else attrNode.ifHasIndex=false;
 		if(attrMap.count(tableName)==0)
 		{
 			vector<AttrNode> attrVec;
@@ -85,9 +87,16 @@ RC getAttrMap(int nSelAttrs,RelAttr **selAttrs,map<string,vector<AttrNode>> &att
 	free(tmpRec);
 	return SUCCESS;
 }
+
+
 //从指定的表中查询字段并返回
-RC getFieldsFromTable(string &tableName,vector<AttrNode> &attrVec,char** rec)
+RC getFieldsFromTable(string &tableName,vector<AttrNode> &attrVec,map<string,vector<string>> &recMap)
 {
+	if(recMap.count(tableName)==0)
+	{
+		vector<string> tmp;
+		recMap[tableName]=tmp;
+	}
 	RC tmp;
 	RM_FileHandle* recfileHandle=new RM_FileHandle();
 	recfileHandle->bOpen=false;
@@ -101,24 +110,42 @@ RC getFieldsFromTable(string &tableName,vector<AttrNode> &attrVec,char** rec)
 	if(SUCCESS!=tmp) return tmp;
 	while(GetNextRec(recfileScan,tmpRec)==SUCCESS)
 	{
-		for(int i=0;i<attrVec.size();++i)//
+		string tmpRes="";
+		for(int i=0;i<attrVec.size();++i)
+			tmpRes+=attrVec[i].relName;
+		if(tmpRes.size()!=0)
+			recMap[tableName].push_back(tmpRes);
 	}
-	
+	return SUCCESS;
 }
+
 //无条件表查询
-RC selectWithoutCon(int nRelations,char** relations,SelResult* res,map<string,vector<AtrrNode>> &attrMap)
-{
-	map<string,vector<char*>> recMap;
-	
+RC selectWithoutCon(map<string,vector<AtrrNode>> &attrMap,map<string,vector<string>> recMap)
+{	
+	RC tmp;
 	map<string,vector<AtrrNode>>::iterator it=attrMap.begin();
-	
+	RM_FileHandle* recfileHandle=new RM_FileHandle();
+	recfileHandle->bOpen=false;
 	for(;it!=attrMap.end();++it)
 	{
-		tmp=RM_OpenFile((char*)it->first.c_str(),recfileHandle);
+		tmp=getFieldsFromTable((string)it->first,attrMap[it->first],recMap);
+		if(SUCCESS!=tmp) return tmp;
 	}
+	return SUCCESS;
+}
+vector<string> getDiKar(vector<string> &res1,vector<string> &res2)
+{
+	if(res1.size()==0) return res2;
+	if(res2.size()==0) return res1;
+	vector<string> res;
+	for(int i=0;i<res1.size();++i)
+		for(int j=0;j<res2.size();++j)
+			res.push_back(res1[i]+res1[j]);
+	return res;
 }
 RC Select(int nSelAttrs,RelAttr **selAttrs,int nRelations,char **relations,int nConditions,Condition *conditions,SelResult * res)
 {	
+	SelResult* tmpRes=res;
 	RC tmp;
 	tmp=ifHasTable(nRelations,relations);//先检查所有的表是否存在
 	if(SUCCESS!=tmp)
@@ -126,12 +153,41 @@ RC Select(int nSelAttrs,RelAttr **selAttrs,int nRelations,char **relations,int n
 		AfxMessageBox("表不存在！");
 		return tmp;
 	}
-	int sumLength=0;//结果集单条记录的总长
 	map<string,vector<AtrrNode>> attrMap;
-	getAttrMap(nSelAttrs,selAttrs,attrMap,&sumLength);
+	map<string,vector<string>> recMap;
+	getAttrMap(nSelAttrs,selAttrs,attrMap);
 	if(nConditions==0)//无条件
+		selectWithoutCon(attrMap,recMap);
+	map<string,vector<AttrNode>>::iterator it=attrMap.begin();
+	int index=0;
+	tmpRes->row_num=0;
+	for(;it!=attrMap.end();++it)  //初始化结果集字段
 	{
-		selectWithoutCon()
+		for(int i=0;i<it->second.size();++i)
+		{
+			tmpRes->col_num++;
+			strcpy(tmpRes->fields[i],it->second[i].relName);
+			tmpRes->length[index]=it->second[i].length;
+			tmpRes->type[index]=it->second[i].type;
+		}
+	}
+	//求结果的笛卡尔积
+	map<string,vector<string>>::iterator it1=recMap.begin();
+	vector<string> resVec;
+	for(;it1!=recMap.end();it1++)
+		resVec=getDiKar(resVec,it1->second);
+	//合并到最终的结果集
+	for(int i=0;i<resVec.size();++i)
+	{
+		if(tmpRes->row_num>=100) //记录数超过100
+		{
+			tmpRes->next_res=new SelResult();
+			tmpRes=tmpRes->next_res;
+			tmpRes->row_num=0;
+			tmpRes->next_res=NULL;
+		}
+		(*tmpRes->res[i%100])=(char*)resVec[i].c_str();
+		tmpRes->row_num++;
 	}
 	return SUCCESS;
 }

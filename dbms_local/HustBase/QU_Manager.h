@@ -2,6 +2,7 @@
 #define __QUERY_MANAGER_H_
 #include <vector>
 #include <map>
+#include <string>
 #include "str.h"
 #include "RM_Manager.h"
 using namespace std;
@@ -20,6 +21,7 @@ typedef struct AtrrNode{
 	int length;
 	int offset;
 	char relName[21];
+	bool ifHasIndex;
 }AttrNode;
 
 void Init_Result(SelResult * res);

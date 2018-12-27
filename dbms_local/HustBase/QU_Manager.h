@@ -1,7 +1,10 @@
 #ifndef __QUERY_MANAGER_H_
 #define __QUERY_MANAGER_H_
+#include <vector>
+#include <map>
 #include "str.h"
-
+#include "RM_Manager.h"
+using namespace std;
 typedef struct SelResult{
 	int col_num;
 	int row_num;
@@ -11,6 +14,13 @@ typedef struct SelResult{
 	char ** res[100];	//最多一百条记录
 	SelResult * next_res;
 }SelResult;
+
+typedef struct AtrrNode{
+	AttrType type;
+	int length;
+	int offset;
+	char relName[21];
+}AttrNode;
 
 void Init_Result(SelResult * res);
 void Destory_Result(SelResult * res);
